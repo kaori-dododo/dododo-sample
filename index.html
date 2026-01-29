@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>dododo | 行動できるマインドの土台を整える</title>
+    <meta name="description" content="思考は、行動に従う。行動できる自分に生まれ変わるコミュニティ dododo。">
+    
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Shippori+Mincho:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Noto Sans JP"', 'sans-serif'],
+                        serif: ['"Shippori Mincho"', 'serif'],
+                    },
+                    colors: {
+                        black: '#0a0a0a',
+                        dark: '#1a1a1a',
+                        gray: '#888888',
+                        light: '#f5f5f5',
+                        white: '#ffffff',
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: 0, transform: 'translateY(40px)' },
+                            '100%': { opacity: 1, transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Utilities */
+        body {
+            background-color: #ffffff;
+            color: #0a0a0a;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* Smooth Scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Utility for Reveal Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Stagger Delays */
+        .delay-100 { transition-delay: 0.1s; }
+        .delay-200 { transition-delay: 0.2s; }
+        .delay-300 { transition-delay: 0.3s; }
+
+        /* Image Filter for Monochrome Theme */
+        .img-mono {
+            filter: grayscale(100%) contrast(1.1);
+            transition: filter 0.5s ease, transform 0.7s ease;
+        }
+        .group:hover .img-mono {
+            filter: grayscale(0%) contrast(1);
+            transform: scale(1.03);
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // --- Components ---
+
+        // Custom Hook for Scroll Reveal
+        const useScrollReveal = () => {
+            useEffect(() => {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('active');
+                        }
+                    });
+                }, { threshold: 0.1 });
+
+                document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+                return () => observer.disconnect();
+            }, []);
+        };
+
+        // Navigation
+        const Header = () => {
+            const [scrolled, setScrolled] = useState(false);
+
+            useEffect(() => {
+                const handleScroll = () => setScrolled(window.scrollY > 50);
+                window.addEventListener('scroll', handleScroll);
+                return () => window.removeEventListener('scroll', handleScroll);
+            }, []);
+
+            return (
+                <header className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${scrolled ? 'bg-white/90 backdrop-blur-md py-4 border-b border-gray-100' : 'bg-transparent py-6'}`}>
+                    <div className="container mx-auto px-6 flex justify-between items-center">
+                        <h1 className="text-2xl font-serif font-bold tracking-widest uppercase">
+                            dododo
+                        </h1>
+                        <nav className="hidden md:flex gap-8">
+                            {['About', 'Features', 'Organizer', 'Plan'].map((item) => (
+                                <a key={item} href={`#${item.toLowerCase()}`} className="text-sm font-medium tracking-wider hover:text-gray transition-colors uppercase">
+                                    {item}
+                                </a>
+                            ))}
+                        </nav>
+                        <a href="#join" className="bg-black text-white px-6 py-2 text-sm font-medium hover:bg-gray-800 transition-colors">
+                            参加する
+                        </a>
+                    </div>
+                </header>
+            );
+        };
+
+        // Hero Section
+        const Hero = () => {
+            return (
+                <section className="relative h-screen flex items-center justify-center overflow-hidden">
+                    {/* Background Image (Abstract Minimal) */}
+                    <div className="absolute inset-0 z-0">
+                        <img 
+                            src="https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?q=80&w=2070&auto=format&fit=crop" 
+                            alt="Minimal Background" 
+                            className="w-full h-full object-cover img-mono opacity-80"
+                        />
+                        <div className="absolute inset-0 bg-white/40 mix-blend-overlay"></div>
+                    </div>
+                    
+                    <div className="relative z-10 container mx-auto px-6 text-center">
+                        <p className="reveal text-sm md:text-base tracking-[0.3em] uppercase mb-6 font-medium text-gray-700">
+                            Mindset Foundation
+                        </p>
+                        <h2 className="reveal delay-100 text-5xl md:text-7xl lg:text-8xl font-serif font-medium leading-tight mb-8 text-black">
+                            思考は、<br className="md:hidden" />行動に従う。
+                        </h2>
+                        <p className="reveal delay-200 text-lg md:text-xl font-sans font-light tracking-wide text-gray-800 mb-12 max-w-2xl mx-auto">
+                            マインドの土台を整え、突き抜ける場所。<br/>
+                            行動できる自分に生まれ変わるコミュニティ "dododo"
+                        </p>
+                        <div className="reveal delay-300">
+                            <a href="#about" className="group inline-flex items-center gap-2 border-b border-black pb-1 text-sm tracking-widest hover:text-gray-600 hover:border-gray-600 transition-all">
+                                VIEW CONCEPT
+                                <span className="transform group-hover:translate-x-1 transition-transform">→</span>
+                            </a>
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        // Problem & Solution (About)
+        const About = () => {
+            return (
+                <section id="about" className="py-24 md:py-32 bg-white">
+                    <div className="container mx-auto px-6 max-w-4xl text-center">
+                        <h3 className="reveal text-2xl md:text-4xl font-serif mb-12 leading-relaxed">
+                            なぜ、やろうと思っても<br/>
+                            <span className="border-b px-1 border-black">動けない</span>のか？
+                        </h3>
+                        <p className="reveal delay-100 text-gray-600 leading-loose text-justify md:text-center mb-8 font-light">
+                            多くの人がテクニックやノウハウに走りますが、本当に重要なのは「マインドの土台」です。
+                            土台がグラついていては、どんなに立派な柱を立てようとしても崩れてしまいます。
+                            逆に、ここさえ整えば、行動は無理なく自然と溢れ出します。
+                        </p>
+                        <p className="reveal delay-200 text-lg font-medium tracking-wide">
+                            dododoは、その「土台」を再構築する場所です。
+                        </p>
+                    </div>
+                </section>
+            );
+        };
+
+        // Features
+        const Features = () => {
+            const features = [
+                {
+                    title: "限定コンテンツ",
+                    desc: "一般には出回らない、行動変革のための核心的メソッドを定期配信。思考の癖を書き換えます。",
+                    img: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=1000&auto=format&fit=crop"
+                },
+                {
+                    title: "環境の力",
+                    desc: "高い熱量を持つ仲間と共に過ごすことで、あなたの「当たり前」の基準を引き上げます。",
+                    img: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1000&auto=format&fit=crop"
+                },
+                {
+                    title: "実践フィードバック",
+                    desc: "インプットだけで終わらせない。行動ベースのアウトプットに対し、具体的なフィードバックを行います。",
+                    img: "https://images.unsplash.com/photo-1531403009284-440f080d1e12?q=80&w=1000&auto=format&fit=crop"
+                }
+            ];
+
+            return (
+                <section id="features" className="py-24 bg-light">
+                    <div className="container mx-auto px-6">
+                        <div className="mb-20 text-center">
+                            <span className="text-xs font-bold tracking-widest uppercase text-gray-400 mb-2 block">Features</span>
+                            <h3 className="text-3xl md:text-4xl font-serif">dododoが提供する3つの価値</h3>
+                        </div>
+
+                        <div className="grid md:grid-cols-3 gap-12">
+                            {features.map((item, idx) => (
+                                <div key={idx} className="reveal group">
+                                    <div className="overflow-hidden aspect-[4/3] mb-8 bg-gray-200">
+                                        <img src={item.img} alt={item.title} className="w-full h-full object-cover img-mono" />
+                                    </div>
+                                    <h4 className="text-xl font-serif mb-4 border-l-2 border-black pl-4">{item.title}</h4>
+                                    <p className="text-gray-600 text-sm leading-7 font-light">{item.desc}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        // Organizer
+        const Organizer = () => {
+            return (
+                <section id="organizer" className="py-24 md:py-32 bg-black text-white">
+                    <div className="container mx-auto px-6">
+                        <div className="flex flex-col md:flex-row items-center gap-16 md:gap-24">
+                            <div className="w-full md:w-1/2 reveal">
+                                <div className="aspect-[3/4] overflow-hidden relative">
+                                    <img 
+                                        src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1000&auto=format&fit=crop" 
+                                        alt="dododoの申し子" 
+                                        className="w-full h-full object-cover grayscale opacity-90"
+                                    />
+                                    <div className="absolute inset-0 border border-white/10 m-4"></div>
+                                </div>
+                            </div>
+                            <div className="w-full md:w-1/2 reveal delay-100">
+                                <span className="block text-gray-400 tracking-widest text-xs mb-4 uppercase">Organizer</span>
+                                <h3 className="text-3xl md:text-4xl font-serif mb-2">dododoの申し子</h3>
+                                <p className="text-sm text-gray-400 mb-8 tracking-wider">Founder / 行動変革の体現者</p>
+                                
+                                <blockquote className="text-lg md:text-xl font-serif leading-relaxed opacity-90 mb-8 border-l border-white pl-6 italic">
+                                    "行動だけが現実を変える。<br/>
+                                    私がその先頭を走り、背中を見せ続けます。<br/>
+                                    一緒に、見たことのない景色を見に行きましょう。"
+                                </blockquote>
+                                <p className="text-sm text-gray-500 leading-7 font-light">
+                                    数々の失敗を経て、マインドセットの重要性に気づく。
+                                    独自のメソッドで多くの人々の行動変革をサポート。
+                                    dododoを通じて、挑戦する人が正当に評価される世界を目指す。
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        // Price
+        const Price = () => {
+            return (
+                <section id="plan" className="py-24 md:py-32 bg-white relative">
+                    {/* Background Pattern */}
+                    <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-[0.03] pointer-events-none">
+                        <div className="w-96 h-96 border border-black rounded-full absolute -top-20 -left-20"></div>
+                        <div className="w-96 h-96 border border-black rounded-full absolute top-40 right-0"></div>
+                    </div>
+
+                    <div className="container mx-auto px-6 relative z-10 max-w-3xl text-center">
+                        <h3 className="reveal text-3xl md:text-4xl font-serif mb-4">覚悟を決めたあなたへ</h3>
+                        <p className="reveal delay-100 text-gray-500 mb-16">人生を変えるためのチケットです。</p>
+
+                        <div className="reveal delay-200 border border-black p-12 md:p-16 bg-white shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] hover:shadow-[15px_15px_0px_0px_rgba(0,0,0,1)] transition-shadow duration-300">
+                            <h4 className="text-sm font-bold tracking-[0.2em] uppercase mb-8">dododo Membership</h4>
+                            <div className="flex justify-center items-baseline gap-2 mb-8">
+                                <span className="text-sm text-gray-500">入会費</span>
+                                <span className="text-5xl md:text-6xl font-serif font-bold">ペッペー</span>
+                                <span className="text-xl">円</span>
+                            </div>
+                            
+                            <ul className="text-left max-w-xs mx-auto space-y-4 mb-12 text-sm text-gray-600">
+                                <li className="flex items-center gap-3">
+                                    <span className="w-1.5 h-1.5 bg-black rounded-full"></span> 限定コンテンツへのアクセス
+                                </li>
+                                <li className="flex items-center gap-3">
+                                    <span className="w-1.5 h-1.5 bg-black rounded-full"></span> メンバー限定コミュニティ招待
+                                </li>
+                                <li className="flex items-center gap-3">
+                                    <span className="w-1.5 h-1.5 bg-black rounded-full"></span> 定期的なオンラインMTG
+                                </li>
+                                <li className="flex items-center gap-3">
+                                    <span className="w-1.5 h-1.5 bg-black rounded-full"></span> 行動フィードバック権利
+                                </li>
+                            </ul>
+
+                            <a href="#join" id="join" className="block w-full bg-black text-white py-4 text-sm tracking-widest font-bold hover:bg-gray-800 transition-colors uppercase">
+                                今すぐ申し込む
+                            </a>
+                            <p className="mt-4 text-xs text-gray-400">※ 入会審査がございます。</p>
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        // FAQ
+        const FAQ = () => {
+            const faqs = [
+                { q: "どのような人が参加していますか？", a: "学生から経営者まで、現状を変えたいと願う幅広い層の方々が参加しています。共通しているのは「行動したい」という強い意志です。" },
+                { q: "見る専（ROM専）でも大丈夫ですか？", a: "はい、可能です。ただし、dododoは「行動」を重視するコミュニティですので、少しずつでもアウトプットすることをお勧めしています。" },
+                { q: "支払い方法は何がありますか？", a: "クレジットカード決済に対応しています。ペッペー円の決済方法については、申し込み後に詳細をご案内します。" },
+            ];
+
+            const [openIndex, setOpenIndex] = useState(null);
+
+            const toggle = (index) => {
+                setOpenIndex(openIndex === index ? null : index);
+            };
+
+            return (
+                <section className="py-24 bg-gray-50">
+                    <div className="container mx-auto px-6 max-w-3xl">
+                        <h3 className="text-2xl font-serif mb-12 text-center">よくある質問</h3>
+                        <div className="space-y-4">
+                            {faqs.map((faq, idx) => (
+                                <div key={idx} className="reveal bg-white border border-gray-200">
+                                    <button 
+                                        className="w-full text-left px-6 py-5 flex justify-between items-center focus:outline-none"
+                                        onClick={() => toggle(idx)}
+                                    >
+                                        <span className="font-medium text-gray-800">{faq.q}</span>
+                                        <span className={`transform transition-transform duration-300 ${openIndex === idx ? 'rotate-180' : ''}`}>
+                                            ▼
+                                        </span>
+                                    </button>
+                                    <div 
+                                        className={`overflow-hidden transition-all duration-300 ${openIndex === idx ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}
+                                    >
+                                        <p className="px-6 pb-6 text-sm text-gray-600 leading-relaxed">
+                                            {faq.a}
+                                        </p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        // Footer
+        const Footer = () => {
+            return (
+                <footer className="bg-black text-white py-12 border-t border-gray-800">
+                    <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
+                        <div className="text-center md:text-left">
+                            <h2 className="text-2xl font-serif font-bold tracking-widest mb-2">dododo</h2>
+                            <p className="text-xs text-gray-500">Mindset & Action Community</p>
+                        </div>
+                        <div className="flex gap-6">
+                            <a href="#" className="text-xs text-gray-400 hover:text-white transition-colors uppercase tracking-wider">Terms</a>
+                            <a href="#" className="text-xs text-gray-400 hover:text-white transition-colors uppercase tracking-wider">Privacy</a>
+                            <a href="#" className="text-xs text-gray-400 hover:text-white transition-colors uppercase tracking-wider">Contact</a>
+                        </div>
+                        <div className="text-xs text-gray-600">
+                            &copy; {new Date().getFullYear()} dododo. All Rights Reserved.
+                        </div>
+                    </div>
+                </footer>
+            );
+        };
+
+        // Main App
+        const App = () => {
+            useScrollReveal();
+
+            return (
+                <div className="antialiased">
+                    <Header />
+                    <Hero />
+                    <About />
+                    <Features />
+                    <Organizer />
+                    <Price />
+                    <FAQ />
+                    <Footer />
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
